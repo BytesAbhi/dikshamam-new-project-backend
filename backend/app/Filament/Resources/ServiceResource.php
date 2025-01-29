@@ -9,6 +9,7 @@ use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -26,7 +27,7 @@ class ServiceResource extends Resource
     {
         return $form->schema([
             Forms\Components\TextInput::make('service')->required(),
-            Forms\Components\FileUpload::make('image')->image()->required(),
+            Forms\Components\FileUpload::make('image')->directory('services')->image()->required(),
         ]);
     }
 
@@ -35,7 +36,10 @@ class ServiceResource extends Resource
         return $table
             ->columns([
                 TextColumn::make('service'),
-                TextColumn::make('image')->image(),
+                ImageColumn::make('logo')
+                    ->disk('services') // Make sure it's stored in public
+                    ->size(50)
+                    ->circular(),
             ])
             ->filters([
                 //

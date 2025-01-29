@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Car;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class CarController extends Controller
 {
@@ -11,15 +13,7 @@ class CarController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(Car::all(), 200);
     }
 
     /**
@@ -27,38 +21,81 @@ class CarController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'car' => 'required|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'required|boolean',
+        ]);
+
+        $data = $request->only(['car', 'status']);
+
+        if ($request->hasFile('image')) {
+            $data['image'] = $request->file('image')->store('car_images', 'public');
+        }
+
+        $car = Car::create($data);
+
+        return response()->json($car, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $car = Car::find($id);
+        if (!$car) {
+            return response()->json(['message' => 'Car not found'], 404);
+        }
+        return response()->json($car, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $car = Car::find($id);
+        if (!$car) {
+            return response()->json(['message' => 'Car not found'], 404);
+        }
+
+        $request->validate([
+            'car' => 'sometimes|string',
+            'image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
+            'status' => 'sometimes|boolean',
+        ]);
+
+        if ($request->hasFile('image')) {
+            if ($car->image) {
+                Storage::disk('public')->delete($car->image);
+            }
+            $car->image = $request->file('image')->store('car_images', 'public');
+        }
+
+        $car->car = $request->car ?? $car->car;
+        $car->status = $request->status ?? $car->status;
+        $car->save();
+
+        return response()->json($car, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $car = Car::find($id);
+        if (!$car) {
+            return response()->json(['message' => 'Car not found'], 404);
+        }
+
+        if ($car->image) {
+            Storage::disk('public')->delete($car->image);
+        }
+
+        $car->delete();
+
+        return response()->json(['message' => 'Car deleted successfully'], 200);
     }
 }

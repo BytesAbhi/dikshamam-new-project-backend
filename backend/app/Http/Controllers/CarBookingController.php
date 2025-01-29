@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\CarBooking;
 use Illuminate\Http\Request;
 
 class CarBookingController extends Controller
@@ -11,15 +12,7 @@ class CarBookingController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(CarBooking::all(), 200);
     }
 
     /**
@@ -27,38 +20,69 @@ class CarBookingController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|string|max:15',
+            'message' => 'nullable|string',
+            'car' => 'required|string',
+        ]);
+
+        $data = $request->all();
+        $data['added_on'] = now(); // Set current timestamp
+
+        $booking = CarBooking::create($data);
+
+        return response()->json($booking, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $booking = CarBooking::find($id);
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+        return response()->json($booking, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $booking = CarBooking::find($id);
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255',
+            'mobile' => 'sometimes|string|max:15',
+            'message' => 'nullable|string',
+            'car' => 'sometimes|string',
+        ]);
+
+        $booking->update($request->all());
+
+        return response()->json($booking, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $booking = CarBooking::find($id);
+        if (!$booking) {
+            return response()->json(['message' => 'Booking not found'], 404);
+        }
+
+        $booking->delete();
+
+        return response()->json(['message' => 'Booking deleted successfully'], 200);
     }
 }

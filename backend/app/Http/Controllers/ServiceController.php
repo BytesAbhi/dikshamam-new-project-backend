@@ -2,63 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Service;
 use Illuminate\Http\Request;
 
 class ServiceController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(Service::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'service' => 'required|string|max:255',
+            'image' => 'required|image',
+        ]);
+
+        $service = Service::create($request->all());
+        return response()->json($service, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $service = Service::find($id);
+        if (!$service) {
+            return response()->json(['message' => 'Service not found'], 404);
+        }
+        return response()->json($service, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $service = Service::find($id);
+        if (!$service) {
+            return response()->json(['message' => 'Service not found'], 404);
+        }
+
+        $request->validate([
+            'service' => 'sometimes|string|max:255',
+            'image' => 'sometimes|image',
+        ]);
+
+        $service->update($request->all());
+        return response()->json($service, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $service = Service::find($id);
+        if (!$service) {
+            return response()->json(['message' => 'Service not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $service->delete();
+        return response()->json(['message' => 'Service deleted successfully'], 200);
     }
 }

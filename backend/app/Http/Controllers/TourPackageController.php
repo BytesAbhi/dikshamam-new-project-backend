@@ -2,63 +2,58 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TourCategory;
 use Illuminate\Http\Request;
 
-class TourPackageController extends Controller
+class TourCategoryController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(TourCategory::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'category' => 'required|string|max:255',
+        ]);
+
+        $tourCategory = TourCategory::create($request->all());
+        return response()->json($tourCategory, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $tourCategory = TourCategory::find($id);
+        if (!$tourCategory) {
+            return response()->json(['message' => 'Tour category not found'], 404);
+        }
+        return response()->json($tourCategory, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $tourCategory = TourCategory::find($id);
+        if (!$tourCategory) {
+            return response()->json(['message' => 'Tour category not found'], 404);
+        }
+
+        $request->validate([
+            'category' => 'sometimes|string|max:255',
+        ]);
+
+        $tourCategory->update($request->all());
+        return response()->json($tourCategory, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $tourCategory = TourCategory::find($id);
+        if (!$tourCategory) {
+            return response()->json(['message' => 'Tour category not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $tourCategory->delete();
+        return response()->json(['message' => 'Tour category deleted successfully'], 200);
     }
 }

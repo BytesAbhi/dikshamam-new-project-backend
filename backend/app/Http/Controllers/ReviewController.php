@@ -2,63 +2,66 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Review;
 use Illuminate\Http\Request;
 
 class ReviewController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(Review::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'rating' => 'required|integer|min:1|max:5',
+            'name' => 'required|string|max:255',
+            'review' => 'required|string|max:1000',
+            'added_on' => 'nullable|date',
+            'status' => 'required|boolean',
+        ]);
+
+        $review = Review::create($request->all());
+        return response()->json($review, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $review = Review::find($id);
+        if (!$review) {
+            return response()->json(['message' => 'Review not found'], 404);
+        }
+        return response()->json($review, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $review = Review::find($id);
+        if (!$review) {
+            return response()->json(['message' => 'Review not found'], 404);
+        }
+
+        $request->validate([
+            'rating' => 'sometimes|integer|min:1|max:5',
+            'name' => 'sometimes|string|max:255',
+            'review' => 'sometimes|string|max:1000',
+            'added_on' => 'sometimes|date',
+            'status' => 'sometimes|boolean',
+        ]);
+
+        $review->update($request->all());
+        return response()->json($review, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $review = Review::find($id);
+        if (!$review) {
+            return response()->json(['message' => 'Review not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $review->delete();
+        return response()->json(['message' => 'Review deleted successfully'], 200);
     }
 }

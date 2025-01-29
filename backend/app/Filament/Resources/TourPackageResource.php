@@ -26,21 +26,25 @@ class TourPackageResource extends Resource
             ->schema([
                 Forms\Components\Select::make('tour_cat_id')
                     ->label('Tour Category')
-                    ->options(TourCategory::pluck('category', 'id'))
+                    ->options(fn() => TourCategory::pluck('category', 'id'))
+                    ->relationship('tourCategory', 'category')
                     ->searchable()
                     ->required(),
 
                 Forms\Components\Select::make('destination_id')
                     ->label('Destination')
-                    ->options(Destination::pluck('name', 'id'))
+                    ->options(fn() => Destination::pluck('name', 'id'))
+                    ->relationship('destination', 'name')
                     ->searchable()
                     ->required(),
 
                 Forms\Components\Select::make('tour_type')
                     ->label('Tour Type')
-                    ->options(TourType::pluck('name', 'id'))
+                    ->options(fn() => TourType::pluck('name', 'id'))
+                    ->relationship('tourType', 'name')
                     ->searchable()
                     ->required(),
+
 
                 Forms\Components\TextInput::make('tour_code')
                     ->label('Tour Code')
@@ -197,6 +201,7 @@ class TourPackageResource extends Resource
                 Tables\Filters\SelectFilter::make('tour_type')
                     ->label('Tour Type')
                     ->relationship('tourType', 'name'),
+
 
                 Tables\Filters\TernaryFilter::make('status')
                     ->label('Status')

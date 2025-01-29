@@ -2,63 +2,62 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\SiteSeo;
 use Illuminate\Http\Request;
 
 class SiteSeoController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(SiteSeo::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'meta_title' => 'required|string|max:255',
+            'meta_desc' => 'required|string|max:255',
+            'meta_keyword' => 'required|string|max:255',
+        ]);
+
+        $siteSeo = SiteSeo::create($request->all());
+        return response()->json($siteSeo, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $siteSeo = SiteSeo::find($id);
+        if (!$siteSeo) {
+            return response()->json(['message' => 'SEO information not found'], 404);
+        }
+        return response()->json($siteSeo, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $siteSeo = SiteSeo::find($id);
+        if (!$siteSeo) {
+            return response()->json(['message' => 'SEO information not found'], 404);
+        }
+
+        $request->validate([
+            'meta_title' => 'sometimes|string|max:255',
+            'meta_desc' => 'sometimes|string|max:255',
+            'meta_keyword' => 'sometimes|string|max:255',
+        ]);
+
+        $siteSeo->update($request->all());
+        return response()->json($siteSeo, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $siteSeo = SiteSeo::find($id);
+        if (!$siteSeo) {
+            return response()->json(['message' => 'SEO information not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $siteSeo->delete();
+        return response()->json(['message' => 'SEO information deleted successfully'], 200);
     }
 }

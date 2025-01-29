@@ -35,8 +35,7 @@ class CarBookingResource extends Resource
                 Forms\Components\TextInput::make('mobile')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('message')
-                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('message'),
                 Forms\Components\TextInput::make('car')
                     ->required()
                     ->maxLength(255),

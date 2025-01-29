@@ -10,6 +10,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Columns\IconColumn;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
@@ -34,7 +35,7 @@ class SliderResource extends Resource
             Forms\Components\TextInput::make('btn2_txt')->required(),
             Forms\Components\TextInput::make('btn2_link')->required(),
             Forms\Components\TextInput::make('slide_order')->numeric()->required(),
-            Forms\Components\FileUpload::make('image')->image()->required(),
+            Forms\Components\FileUpload::make('image')->directory('sliders')->image()->required(),
             Forms\Components\Toggle::make('status')->required(),
         ]);
     }
@@ -50,7 +51,10 @@ class SliderResource extends Resource
                 TextColumn::make('btn2_txt'),
                 TextColumn::make('btn2_link'),
                 TextColumn::make('slide_order'),
-                TextColumn::make('image')->image(),
+                ImageColumn::make('logo')
+                    ->disk('sliders') // Make sure it's stored in public
+                    ->size(50)
+                    ->circular(),
                 IconColumn::make('status')->boolean(),
             ])
             ->filters([

@@ -7,6 +7,7 @@ use App\Models\Destination;
 use Filament\Forms;
 use Filament\Resources\Resource;
 use Filament\Tables;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Table;
 
 class DestinationResource extends Resource
@@ -29,6 +30,7 @@ class DestinationResource extends Resource
                 Forms\Components\Textarea::make('short_desc')
                     ->required(),
                 Forms\Components\FileUpload::make('image')
+                    ->directory('destinantions')
                     ->image(),
                 Forms\Components\Toggle::make('status')
                     ->default(true)
@@ -48,7 +50,10 @@ class DestinationResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('short_desc')
                     ->searchable(),
-                Tables\Columns\ImageColumn::make('image'),
+                ImageColumn::make('image')
+                    ->disk('destinantions') // Make sure it's stored in public
+                    ->size(50)
+                    ->circular(),
                 Tables\Columns\IconColumn::make('status')
                     ->boolean(),
                 Tables\Columns\TextColumn::make('created_at')

@@ -48,8 +48,9 @@ class ContactUsResource extends Resource
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('email'),
                 Tables\Columns\TextColumn::make('subject'),
-                Tables\Columns\TextColumn::make('read_status')
+                Tables\Columns\IconColumn::make('read_status')
                     ->boolean(),
+
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable(),

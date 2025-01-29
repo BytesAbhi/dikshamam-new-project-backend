@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Enquiry;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class EnquiryController extends Controller
 {
@@ -11,15 +13,7 @@ class EnquiryController extends Controller
      */
     public function index()
     {
-        //
-    }
-
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
+        return response()->json(Enquiry::all(), 200);
     }
 
     /**
@@ -27,38 +21,69 @@ class EnquiryController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|string|max:15',
+            'message' => 'required|string',
+            'read_status' => 'nullable|boolean',
+        ]);
+
+        $data = $request->all();
+        $data['read_status'] = $request->read_status ?? false; // Default to unread
+
+        $enquiry = Enquiry::create($data);
+
+        return response()->json($enquiry, 201);
     }
 
     /**
      * Display the specified resource.
      */
-    public function show(string $id)
+    public function show($id)
     {
-        //
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
-    {
-        //
+        $enquiry = Enquiry::find($id);
+        if (!$enquiry) {
+            return response()->json(['message' => 'Enquiry not found'], 404);
+        }
+        return response()->json($enquiry, 200);
     }
 
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $enquiry = Enquiry::find($id);
+        if (!$enquiry) {
+            return response()->json(['message' => 'Enquiry not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255',
+            'mobile' => 'sometimes|string|max:15',
+            'message' => 'sometimes|string',
+            'read_status' => 'sometimes|boolean',
+        ]);
+
+        $enquiry->update($request->all());
+
+        return response()->json($enquiry, 200);
     }
 
     /**
      * Remove the specified resource from storage.
      */
-    public function destroy(string $id)
+    public function destroy($id)
     {
-        //
+        $enquiry = Enquiry::find($id);
+        if (!$enquiry) {
+            return response()->json(['message' => 'Enquiry not found'], 404);
+        }
+
+        $enquiry->delete();
+
+        return response()->json(['message' => 'Enquiry deleted successfully'], 200);
     }
 }

@@ -2,63 +2,60 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\TourType;
 use Illuminate\Http\Request;
 
 class TourTypeController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(TourType::all(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'slug' => 'required|string|max:255|unique:tour_types,slug',
+        ]);
+
+        $tourType = TourType::create($request->all());
+        return response()->json($tourType, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $tourType = TourType::find($id);
+        if (!$tourType) {
+            return response()->json(['message' => 'Tour type not found'], 404);
+        }
+        return response()->json($tourType, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $tourType = TourType::find($id);
+        if (!$tourType) {
+            return response()->json(['message' => 'Tour type not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'slug' => 'sometimes|string|max:255|unique:tour_types,slug,' . $id,
+        ]);
+
+        $tourType->update($request->all());
+        return response()->json($tourType, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $tourType = TourType::find($id);
+        if (!$tourType) {
+            return response()->json(['message' => 'Tour type not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $tourType->delete();
+        return response()->json(['message' => 'Tour type deleted successfully'], 200);
     }
 }

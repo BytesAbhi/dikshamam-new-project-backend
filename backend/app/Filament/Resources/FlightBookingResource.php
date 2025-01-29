@@ -34,8 +34,7 @@ class FlightBookingResource extends Resource
                 Forms\Components\TextInput::make('mobile')
                     ->required()
                     ->maxLength(255),
-                Forms\Components\Textarea::make('message')
-                    ->columnSpanFull(),
+                Forms\Components\RichEditor::make('message'),
                 Forms\Components\DateTimePicker::make('added_on')
                     ->required(),
             ]);

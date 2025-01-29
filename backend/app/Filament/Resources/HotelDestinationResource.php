@@ -26,6 +26,7 @@ class HotelDestinationResource extends Resource
         return $form
             ->schema([
                 Forms\Components\TextInput::make('name')
+                    ->label('Hotel Destination')
                     ->required()
                     ->maxLength(255),
             ]);
@@ -35,7 +36,10 @@ class HotelDestinationResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->label('Id'),
                 Tables\Columns\TextColumn::make('name')
+                    ->label('Hotel Destination')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()

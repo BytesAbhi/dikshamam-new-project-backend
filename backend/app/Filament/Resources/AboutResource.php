@@ -21,9 +21,10 @@ class AboutResource extends Resource
     {
         return $form
             ->schema([
-                Forms\Components\Textarea::make('about')
+                Forms\Components\RichEditor::make('about')
                     ->required(),
                 Forms\Components\FileUpload::make('image')
+                    ->directory('About')
                     ->image()
                     ->required(),
             ]);

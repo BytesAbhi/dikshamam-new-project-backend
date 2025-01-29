@@ -2,63 +2,74 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\HotelBooking;
 use Illuminate\Http\Request;
 
 class HotelBookingController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
     public function index()
     {
-        //
+        return response()->json(HotelBooking::with('destination')->get(), 200);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
-    /**
-     * Store a newly created resource in storage.
-     */
     public function store(Request $request)
     {
-        //
+        $request->validate([
+            'name' => 'required|string|max:255',
+            'email' => 'required|email|max:255',
+            'mobile' => 'required|string|max:15',
+            'check_in_date' => 'required|date',
+            'check_out_date' => 'required|date',
+            'adults' => 'required|integer',
+            'children' => 'nullable|integer',
+            'destination' => 'required|exists:hotel_destinations,id',
+            'stay_type' => 'required|string|max:255',
+        ]);
+
+        $hotelBooking = HotelBooking::create($request->all());
+        return response()->json($hotelBooking, 201);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function show($id)
     {
-        //
+        $hotelBooking = HotelBooking::with('destination')->find($id);
+        if (!$hotelBooking) {
+            return response()->json(['message' => 'Hotel booking not found'], 404);
+        }
+        return response()->json($hotelBooking, 200);
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     */
-    public function edit(string $id)
+    public function update(Request $request, $id)
     {
-        //
+        $hotelBooking = HotelBooking::find($id);
+        if (!$hotelBooking) {
+            return response()->json(['message' => 'Hotel booking not found'], 404);
+        }
+
+        $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255',
+            'mobile' => 'sometimes|string|max:15',
+            'check_in_date' => 'sometimes|date',
+            'check_out_date' => 'sometimes|date',
+            'adults' => 'sometimes|integer',
+            'children' => 'sometimes|nullable|integer',
+            'destination' => 'sometimes|exists:hotel_destinations,id',
+            'stay_type' => 'sometimes|string|max:255',
+        ]);
+
+        $hotelBooking->update($request->all());
+        return response()->json($hotelBooking, 200);
     }
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
+    public function destroy($id)
     {
-        //
-    }
+        $hotelBooking = HotelBooking::find($id);
+        if (!$hotelBooking) {
+            return response()->json(['message' => 'Hotel booking not found'], 404);
+        }
 
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        $hotelBooking->delete();
+        return response()->json(['message' => 'Hotel booking deleted successfully'], 200);
     }
 }
